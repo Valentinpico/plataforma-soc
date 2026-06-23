@@ -2,8 +2,8 @@
 .env
 
 # .NET
-backend/bin/
-backend/obj/
+backend/**/bin/
+backend/**/obj/
 
 # node
 frontend/node_modules/

@@ -2,6 +2,8 @@ export interface Source {
   id: number;
   name: string;
   type?: string;
+  description?: string;
+  url?: string;
 }
 
 export interface Dataset {
@@ -42,6 +44,28 @@ export interface EnvironmentalVariable {
   id: number;
   name: string;
   unit?: string;
+  description?: string;
+}
+
+export interface SourceInput {
+  name: string;
+  type?: string;
+  description?: string;
+  url?: string;
+}
+
+export interface VariableInput {
+  name: string;
+  unit?: string;
+  description?: string;
+}
+
+export interface ModelInput {
+  name: string;
+  architecture?: string;
+  scheme?: string;
+  framework?: string;
+  codePointer?: string;
   description?: string;
 }
 

@@ -3,20 +3,25 @@ import { useAdmin } from "../../../shared/auth/AdminContext";
 import { Button } from "../../../shared/components/Button";
 import { ConfirmModal } from "../../../shared/components/ConfirmModal";
 import { Tabs } from "../../../shared/components/Tabs";
+import { catalogApi } from "../api/catalogApi";
 import { useCatalog } from "../hooks/useCatalog";
 import { useDatasetActions } from "../hooks/useDatasetActions";
 import { useDocumentActions } from "../hooks/useDocumentActions";
-import type { Dataset, DocumentItem, Model } from "../types/catalog";
+import { useEntityActions } from "../hooks/useEntityActions";
+import type { Dataset, DocumentItem, EnvironmentalVariable, Model, Source } from "../types/catalog";
 import { DatasetFormModal } from "./DatasetFormModal";
 import { DatasetTable } from "./DatasetTable";
 import { DocumentDetailModal } from "./DocumentDetailModal";
 import { DocumentFormModal } from "./DocumentFormModal";
 import { DocumentList } from "./DocumentList";
 import { GraphView } from "./GraphView";
+import { ManagedList } from "./ManagedList";
 import { MetricsTable } from "./MetricsTable";
 import { ModelDetailModal } from "./ModelDetailModal";
+import { ModelFormModal } from "./ModelFormModal";
 import { ModelList } from "./ModelList";
-import { ResourceList } from "./ResourceList";
+import { SourceFormModal } from "./SourceFormModal";
+import { VariableFormModal } from "./VariableFormModal";
 
 const TABS = [
   { id: "grafo", label: "Grafo" },
@@ -30,6 +35,18 @@ export function CatalogView() {
   const { data, loading, error, reload } = useCatalog();
   const datasetActions = useDatasetActions(reload);
   const documentActions = useDocumentActions(reload);
+  const sourceActions = useEntityActions(
+    { create: catalogApi.createSource, update: catalogApi.updateSource, remove: catalogApi.deleteSource },
+    reload
+  );
+  const variableActions = useEntityActions(
+    { create: catalogApi.createVariable, update: catalogApi.updateVariable, remove: catalogApi.deleteVariable },
+    reload
+  );
+  const modelActions = useEntityActions(
+    { create: catalogApi.createModel, update: catalogApi.updateModel, remove: catalogApi.deleteModel },
+    reload
+  );
 
   const [tab, setTab] = useState("grafo");
   const [editing, setEditing] = useState<Dataset | null | undefined>(undefined);
@@ -38,19 +55,16 @@ export function CatalogView() {
   const [viewingModel, setViewingModel] = useState<Model | null>(null);
   const [editingDoc, setEditingDoc] = useState<DocumentItem | null | undefined>(undefined);
   const [deletingDoc, setDeletingDoc] = useState<DocumentItem | null>(null);
+  const [editingSource, setEditingSource] = useState<Source | null | undefined>(undefined);
+  const [deletingSource, setDeletingSource] = useState<Source | null>(null);
+  const [editingVar, setEditingVar] = useState<EnvironmentalVariable | null | undefined>(undefined);
+  const [deletingVar, setDeletingVar] = useState<EnvironmentalVariable | null>(null);
+  const [editingModel, setEditingModel] = useState<Model | null | undefined>(undefined);
+  const [deletingModel, setDeletingModel] = useState<Model | null>(null);
 
   if (loading) return <p className="text-muted">Cargando catálogo…</p>;
   if (error) return <p className="text-error">Error: {error}</p>;
   if (!data) return null;
-
-  const confirmDeleteDataset = async () => {
-    if (deleting) await datasetActions.remove(deleting.id);
-    setDeleting(null);
-  };
-  const confirmDeleteDoc = async () => {
-    if (deletingDoc) await documentActions.remove(deletingDoc.id);
-    setDeletingDoc(null);
-  };
 
   return (
     <div className="space-y-6">
@@ -80,22 +94,36 @@ export function CatalogView() {
               <h2 className="font-display text-lg text-token">Datasets</h2>
               {isAdmin && <Button onClick={() => setEditing(null)}>+ Nuevo</Button>}
             </div>
-            <DatasetTable
-              datasets={data.datasets}
-              canEdit={isAdmin}
-              onEdit={setEditing}
-              onDelete={setDeleting}
-            />
+            <DatasetTable datasets={data.datasets} canEdit={isAdmin} onEdit={setEditing} onDelete={setDeleting} />
           </section>
+
           <div className="grid gap-8 sm:grid-cols-2">
-            <ResourceList
-              title="Variables ambientales"
-              items={data.variables.map((v) => (v.unit ? `${v.name} (${v.unit})` : v.name))}
-            />
-            <ResourceList
-              title="Fuentes"
-              items={data.sources.map((s) => (s.type ? `${s.name} · ${s.type}` : s.name))}
-            />
+            <section>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="font-display text-base text-token">Variables ambientales</h3>
+                {isAdmin && <Button onClick={() => setEditingVar(null)}>+ Nueva</Button>}
+              </div>
+              <ManagedList
+                items={data.variables}
+                label={(v) => (v.unit ? `${v.name} (${v.unit})` : v.name)}
+                canEdit={isAdmin}
+                onEdit={setEditingVar}
+                onDelete={setDeletingVar}
+              />
+            </section>
+            <section>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="font-display text-base text-token">Fuentes</h3>
+                {isAdmin && <Button onClick={() => setEditingSource(null)}>+ Nueva</Button>}
+              </div>
+              <ManagedList
+                items={data.sources}
+                label={(s) => (s.type ? `${s.name} · ${s.type}` : s.name)}
+                canEdit={isAdmin}
+                onEdit={setEditingSource}
+                onDelete={setDeletingSource}
+              />
+            </section>
           </div>
         </div>
       )}
@@ -103,10 +131,19 @@ export function CatalogView() {
       {tab === "modelos" && (
         <div className="space-y-8">
           <section>
-            <h2 className="mb-2 font-display text-lg text-token">
-              Modelos <span className="text-muted">({data.models.length})</span>
-            </h2>
-            <ModelList models={data.models} onSelect={setViewingModel} />
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="font-display text-lg text-token">
+                Modelos <span className="text-muted">({data.models.length})</span>
+              </h2>
+              {isAdmin && <Button onClick={() => setEditingModel(null)}>+ Nuevo</Button>}
+            </div>
+            <ModelList
+              models={data.models}
+              onSelect={setViewingModel}
+              canEdit={isAdmin}
+              onEdit={setEditingModel}
+              onDelete={setDeletingModel}
+            />
           </section>
           <section>
             <h2 className="mb-3 font-display text-lg text-token">Resultados — métricas en prueba</h2>
@@ -128,42 +165,22 @@ export function CatalogView() {
       )}
 
       {/* Modales (siempre montados) */}
-      <DatasetFormModal
-        open={editing !== undefined}
-        dataset={editing ?? null}
-        sources={data.sources}
-        onClose={() => setEditing(undefined)}
-        onChanged={reload}
-      />
-      <ConfirmModal
-        open={deleting !== null}
-        title="Borrar dataset"
-        message={`¿Borrar "${deleting?.name}"? Esta acción no se puede deshacer.`}
-        onConfirm={confirmDeleteDataset}
-        onClose={() => setDeleting(null)}
-      />
+      <DatasetFormModal open={editing !== undefined} dataset={editing ?? null} sources={data.sources} onClose={() => setEditing(undefined)} onChanged={reload} />
+      <ConfirmModal open={deleting !== null} title="Borrar dataset" message={`¿Borrar "${deleting?.name}"?`} onConfirm={async () => { if (deleting) await datasetActions.remove(deleting.id); setDeleting(null); }} onClose={() => setDeleting(null)} />
+
+      <SourceFormModal open={editingSource !== undefined} source={editingSource ?? null} onClose={() => setEditingSource(undefined)} onChanged={reload} />
+      <ConfirmModal open={deletingSource !== null} title="Borrar fuente" message={`¿Borrar "${deletingSource?.name}"?`} onConfirm={async () => { if (deletingSource) await sourceActions.remove(deletingSource.id); setDeletingSource(null); }} onClose={() => setDeletingSource(null)} />
+
+      <VariableFormModal open={editingVar !== undefined} variable={editingVar ?? null} onClose={() => setEditingVar(undefined)} onChanged={reload} />
+      <ConfirmModal open={deletingVar !== null} title="Borrar variable" message={`¿Borrar "${deletingVar?.name}"?`} onConfirm={async () => { if (deletingVar) await variableActions.remove(deletingVar.id); setDeletingVar(null); }} onClose={() => setDeletingVar(null)} />
 
       <ModelDetailModal model={viewingModel} onClose={() => setViewingModel(null)} />
+      <ModelFormModal open={editingModel !== undefined} model={editingModel ?? null} onClose={() => setEditingModel(undefined)} onChanged={reload} />
+      <ConfirmModal open={deletingModel !== null} title="Borrar modelo" message={`¿Borrar "${deletingModel?.name}"?`} onConfirm={async () => { if (deletingModel) await modelActions.remove(deletingModel.id); setDeletingModel(null); }} onClose={() => setDeletingModel(null)} />
 
-      <DocumentDetailModal
-        doc={viewingDoc}
-        onClose={() => setViewingDoc(null)}
-        onEdit={isAdmin ? (d) => { setViewingDoc(null); setEditingDoc(d); } : undefined}
-        onDelete={isAdmin ? (d) => { setViewingDoc(null); setDeletingDoc(d); } : undefined}
-      />
-      <DocumentFormModal
-        open={editingDoc !== undefined}
-        doc={editingDoc ?? null}
-        onClose={() => setEditingDoc(undefined)}
-        onChanged={reload}
-      />
-      <ConfirmModal
-        open={deletingDoc !== null}
-        title="Borrar documento"
-        message={`¿Borrar "${deletingDoc?.title}"? Esta acción no se puede deshacer.`}
-        onConfirm={confirmDeleteDoc}
-        onClose={() => setDeletingDoc(null)}
-      />
+      <DocumentDetailModal doc={viewingDoc} onClose={() => setViewingDoc(null)} onEdit={isAdmin ? (d) => { setViewingDoc(null); setEditingDoc(d); } : undefined} onDelete={isAdmin ? (d) => { setViewingDoc(null); setDeletingDoc(d); } : undefined} />
+      <DocumentFormModal open={editingDoc !== undefined} doc={editingDoc ?? null} onClose={() => setEditingDoc(undefined)} onChanged={reload} />
+      <ConfirmModal open={deletingDoc !== null} title="Borrar documento" message={`¿Borrar "${deletingDoc?.title}"?`} onConfirm={async () => { if (deletingDoc) await documentActions.remove(deletingDoc.id); setDeletingDoc(null); }} onClose={() => setDeletingDoc(null)} />
     </div>
   );
 }

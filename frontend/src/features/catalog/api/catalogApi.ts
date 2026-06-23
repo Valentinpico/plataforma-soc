@@ -5,8 +5,11 @@ import type {
   EnvironmentalVariable,
   Graph,
   Model,
+  ModelInput,
   Result,
   Source,
+  SourceInput,
+  VariableInput,
 } from "../types/catalog";
 
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
@@ -53,6 +56,19 @@ export const catalogApi = {
   updateDocument: (id: number, form: FormData) =>
     request<DocumentItem>("PUT", `/api/documents/${id}`, form),
   deleteDocument: (id: number) => request<null>("DELETE", `/api/documents/${id}`),
+
+  createSource: (i: SourceInput) => request<Source>("POST", "/api/sources", i),
+  updateSource: (id: number, i: SourceInput) => request<Source>("PUT", `/api/sources/${id}`, i),
+  deleteSource: (id: number) => request<null>("DELETE", `/api/sources/${id}`),
+
+  createVariable: (i: VariableInput) => request<EnvironmentalVariable>("POST", "/api/variables", i),
+  updateVariable: (id: number, i: VariableInput) =>
+    request<EnvironmentalVariable>("PUT", `/api/variables/${id}`, i),
+  deleteVariable: (id: number) => request<null>("DELETE", `/api/variables/${id}`),
+
+  createModel: (i: ModelInput) => request<Model>("POST", "/api/models", i),
+  updateModel: (id: number, i: ModelInput) => request<Model>("PUT", `/api/models/${id}`, i),
+  deleteModel: (id: number) => request<null>("DELETE", `/api/models/${id}`),
 
   adminVerify: async (password: string): Promise<boolean> => {
     const res = await fetch(`${API}/api/admin/verify`, {

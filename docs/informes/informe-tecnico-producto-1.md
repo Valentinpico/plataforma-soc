@@ -118,7 +118,9 @@ Se pobló el repositorio con la información real del proyecto:
 - **Modelos (5):** GraphSAGE y GATv2 en esquemas inductivo y transductivo, y GAT.
 - **Resultados (12):** métricas en prueba (RMSE y R²) por modelo y región
   (Ecuador, Sierra, Costa).
-- **Documentos (6):** informes técnicos firmados y oficio INAMHI.
+- **Documentos (14):** informes técnicos firmados, oficio INAMHI y publicaciones
+  científicas asociadas (incluida la del proyecto: *Graph neural networks for soil
+  organic carbon estimation*, MLWA 2026), referenciadas por DOI o PDF local.
 
 ### 3.4 Grafo de conocimiento
 
@@ -133,8 +135,9 @@ relaciones modeladas son:
 (:Documento)-[:DOCUMENTA]->(:Modelo | :Dataset)
 ```
 
-El grafo resultante contiene 44 nodos y 72 relaciones, e integra de forma navegable la
-totalidad de los activos del proyecto y su trazabilidad.
+El grafo resultante contiene 52 nodos y 97 relaciones, e integra de forma navegable la
+totalidad de los activos del proyecto y su trazabilidad. Se reconstruye automáticamente
+ante cualquier alta, edición o baja en el repositorio.
 
 ### 3.5 Repositorio digital y buenas prácticas
 
@@ -147,17 +150,62 @@ totalidad de los activos del proyecto y su trazabilidad.
 ### 3.6 Interfaz web de gestión
 
 Se desarrolló una interfaz con sistema de diseño propio (tokens semánticos, modo
-claro/oscuro), compuesta por una página de inicio con la presentación del proyecto y el
-equipo, y una página de catálogo que permite consultar y gestionar los activos (alta,
-edición y baja de datasets), visualizar las métricas de desempeño y explorar el grafo de
-conocimiento.
+claro/oscuro), construida con arquitectura por *features* (catálogo, inicio) y
+componentes compartidos reutilizables (`Button`, `Input`, `Select`, `Modal`,
+`ConfirmModal`, `Badge`, `Tabs`). Se compone de:
 
-### 3.7 Validación operativa
+- **Página de inicio:** presentación del proyecto y el equipo.
+- **Catálogo**, organizado en pestañas para no saturar la vista: **Grafo**, **Datos**
+  (datasets, variables, fuentes), **Modelos** (con métricas) y **Documentos**.
+- **Grafo interactivo:** layout *force-directed* con desplazamiento (arrastre), zoom
+  (rueda y botones), resaltado y etiquetas al pasar el cursor, y leyenda por tipo de nodo.
+- **Gestión completa (CRUD)** de datasets, fuentes, variables, modelos y documentos,
+  con detalle de modelos y documentos.
+
+### 3.7 Seguridad y administración
+
+La plataforma opera en **modo lectura por defecto**. La edición (altas, ediciones, bajas
+y carga de archivos) se habilita mediante un **modo administración** protegido por
+contraseña. La verificación es del lado del servidor: toda operación de mutación
+(`POST`/`PUT`/`DELETE`) exige la contraseña en una cabecera y se rechaza con `401` si no
+es válida; las lecturas quedan libres. Los errores de dominio se mapean de forma
+centralizada a respuestas HTTP coherentes.
+
+### 3.8 Pruebas (TDD)
+
+El proyecto adopta **desarrollo guiado por pruebas (TDD)**. Existen dos suites que se
+ejecutan en contenedor:
+
+- **Backend (xUnit + EF Core InMemory):** valida las reglas de dominio del servicio de
+  catálogo (campos obligatorios, fuente inexistente, recursos no encontrados) para
+  datasets, documentos, fuentes, variables y modelos.
+- **Frontend (Vitest + Testing Library):** valida la utilidad de enlaces, el layout del
+  grafo (cantidad, límites y determinismo) y los hooks de acciones (que retornan un
+  resultado booleano y nunca lanzan).
+
+### 3.10 Validación operativa
 
 El entorno completo se levanta con un único comando (`docker compose up`) y expone una
 API REST verificada (endpoints de catálogo y de grafo) y una interfaz funcional. Se
 comprobaron las operaciones de consulta y gestión, la generación del grafo y la
 correspondencia entre el modelo relacional y el grafo de conocimiento.
+
+### 3.11 Proceso de desarrollo
+
+El desarrollo siguió un proceso iterativo e incremental, íntegramente en contenedores:
+
+- **Monorepo único** (backend, frontend, datos, documentación) bajo control de versiones
+  Git con *Conventional Commits* atómicos.
+- **Infraestructura como código** con Docker Compose: cuatro servicios reproducibles,
+  levantables con un único comando, sin instalaciones en el equipo anfitrión.
+- **Arquitectura por capas** en el backend (controlador → servicio → acceso a datos) y
+  **por features** en el frontend, con componentes compartidos reutilizables.
+- **TDD (test primero)** para la lógica de negocio; verificación continua de la API y de
+  la interfaz.
+- **Decisiones técnicas documentadas:** PostgreSQL como fuente de verdad y Neo4j como
+  vista de grafo; catálogo de metadatos con punteros en lugar de almacenar datos pesados;
+  modo lectura por defecto con administración protegida por contraseña.
+- Datos reales del proyecto incorporados de forma incremental y reorganizados por tipo.
 
 ## 4. Conclusiones
 

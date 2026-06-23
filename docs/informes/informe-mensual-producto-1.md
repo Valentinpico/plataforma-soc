@@ -41,7 +41,9 @@ desarrollaron las siguientes actividades:
    variables, modelos GNN, resultados de desempeño y documentos técnicos).
 7. Desarrollo de la interfaz web (inicio con presentación y equipo; catálogo con
    gestión, métricas y grafo) con sistema de diseño propio.
-8. Inicialización del control de versiones (Git) con commits atómicos.
+8. Implementación del modo administración (control de acceso por contraseña, lectura
+   pública por defecto) y de pruebas automatizadas (TDD) para backend y frontend.
+9. Inicialización del control de versiones (Git) con commits atómicos.
 
 ## 3. PRODUCTOS ALCANZADOS
 

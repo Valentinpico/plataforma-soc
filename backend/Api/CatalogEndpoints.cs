@@ -52,6 +52,37 @@ public static class CatalogEndpoints
         });
     }
 
+        // Gestión de fuentes
+        g.MapPost("/sources", async (SourceInput i, CatalogService s) =>
+            Results.Created("/api/sources", await s.CreateSourceAsync(i)));
+        g.MapPut("/sources/{id:int}", (int id, SourceInput i, CatalogService s) => s.UpdateSourceAsync(id, i));
+        g.MapDelete("/sources/{id:int}", async (int id, CatalogService s) =>
+        {
+            await s.DeleteSourceAsync(id);
+            return Results.NoContent();
+        });
+
+        // Gestión de variables
+        g.MapPost("/variables", async (VariableInput i, CatalogService s) =>
+            Results.Created("/api/variables", await s.CreateVariableAsync(i)));
+        g.MapPut("/variables/{id:int}", (int id, VariableInput i, CatalogService s) => s.UpdateVariableAsync(id, i));
+        g.MapDelete("/variables/{id:int}", async (int id, CatalogService s) =>
+        {
+            await s.DeleteVariableAsync(id);
+            return Results.NoContent();
+        });
+
+        // Gestión de modelos
+        g.MapPost("/models", async (ModelInput i, CatalogService s) =>
+            Results.Created("/api/models", await s.CreateModelAsync(i)));
+        g.MapPut("/models/{id:int}", (int id, ModelInput i, CatalogService s) => s.UpdateModelAsync(id, i));
+        g.MapDelete("/models/{id:int}", async (int id, CatalogService s) =>
+        {
+            await s.DeleteModelAsync(id);
+            return Results.NoContent();
+        });
+    }
+
     private static (DocumentInput, IFormFile?) ReadDocumentForm(IFormCollection form)
     {
         var input = new DocumentInput(

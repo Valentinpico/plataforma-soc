@@ -23,6 +23,10 @@ public record DocumentInput(
     string? Description,
     string? Link);
 
+public record SourceInput(string Name, string? Type, string? Description, string? Url);
+public record VariableInput(string Name, string? Unit, string? Description);
+public record ModelInput(string Name, string? Architecture, string? Scheme, string? Framework, string? CodePointer, string? Description);
+
 /// <summary>Catálogo del repositorio: lecturas + gestión. La lógica vive acá, no en los endpoints.</summary>
 public class CatalogService(AppDbContext db, IGraphService graph)
 {
@@ -145,6 +149,100 @@ public class CatalogService(AppDbContext db, IGraphService graph)
         {
             doc.FilePath = input.Link;
         }
+    }
+
+    // --- Gestión (Source) ---
+    public async Task<Source> CreateSourceAsync(SourceInput input)
+    {
+        Require(input.Name, "El nombre de la fuente es obligatorio.");
+        var s = new Source { Name = input.Name, Type = input.Type, Description = input.Description, Url = input.Url };
+        db.Sources.Add(s);
+        await SaveAndRebuildAsync();
+        return s;
+    }
+
+    public async Task<Source> UpdateSourceAsync(int id, SourceInput input)
+    {
+        var s = await db.Sources.FindAsync(id) ?? throw new NotFoundError($"Fuente {id} no existe.");
+        Require(input.Name, "El nombre de la fuente es obligatorio.");
+        (s.Name, s.Type, s.Description, s.Url) = (input.Name, input.Type, input.Description, input.Url);
+        await SaveAndRebuildAsync();
+        return s;
+    }
+
+    public async Task DeleteSourceAsync(int id)
+    {
+        var s = await db.Sources.FindAsync(id) ?? throw new NotFoundError($"Fuente {id} no existe.");
+        db.Sources.Remove(s);
+        await SaveAndRebuildAsync();
+    }
+
+    // --- Gestión (Variable) ---
+    public async Task<EnvironmentalVariable> CreateVariableAsync(VariableInput input)
+    {
+        Require(input.Name, "El nombre de la variable es obligatorio.");
+        var v = new EnvironmentalVariable { Name = input.Name, Unit = input.Unit, Description = input.Description };
+        db.Variables.Add(v);
+        await SaveAndRebuildAsync();
+        return v;
+    }
+
+    public async Task<EnvironmentalVariable> UpdateVariableAsync(int id, VariableInput input)
+    {
+        var v = await db.Variables.FindAsync(id) ?? throw new NotFoundError($"Variable {id} no existe.");
+        Require(input.Name, "El nombre de la variable es obligatorio.");
+        (v.Name, v.Unit, v.Description) = (input.Name, input.Unit, input.Description);
+        await SaveAndRebuildAsync();
+        return v;
+    }
+
+    public async Task DeleteVariableAsync(int id)
+    {
+        var v = await db.Variables.FindAsync(id) ?? throw new NotFoundError($"Variable {id} no existe.");
+        db.Variables.Remove(v);
+        await SaveAndRebuildAsync();
+    }
+
+    // --- Gestión (Model) ---
+    public async Task<Model> CreateModelAsync(ModelInput input)
+    {
+        Require(input.Name, "El nombre del modelo es obligatorio.");
+        var m = new Model { Name = input.Name, Architecture = input.Architecture, Scheme = input.Scheme, Framework = input.Framework, CodePointer = input.CodePointer, Description = input.Description };
+        db.Models.Add(m);
+        await SaveAndRebuildAsync();
+        return m;
+    }
+
+    public async Task<Model> UpdateModelAsync(int id, ModelInput input)
+    {
+        var m = await db.Models.FindAsync(id) ?? throw new NotFoundError($"Modelo {id} no existe.");
+        Require(input.Name, "El nombre del modelo es obligatorio.");
+        m.Name = input.Name;
+        m.Architecture = input.Architecture;
+        m.Scheme = input.Scheme;
+        m.Framework = input.Framework;
+        m.CodePointer = input.CodePointer;
+        m.Description = input.Description;
+        await SaveAndRebuildAsync();
+        return m;
+    }
+
+    public async Task DeleteModelAsync(int id)
+    {
+        var m = await db.Models.FindAsync(id) ?? throw new NotFoundError($"Modelo {id} no existe.");
+        db.Models.Remove(m);
+        await SaveAndRebuildAsync();
+    }
+
+    private static void Require(string value, string message)
+    {
+        if (string.IsNullOrWhiteSpace(value)) throw new ValidationError(message);
+    }
+
+    private async Task SaveAndRebuildAsync()
+    {
+        await db.SaveChangesAsync();
+        await graph.RebuildAsync();
     }
 
     private async Task ValidateAsync(DatasetInput input)

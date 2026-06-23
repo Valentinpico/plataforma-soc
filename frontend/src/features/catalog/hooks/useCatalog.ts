@@ -1,12 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { catalogApi } from "../api/catalogApi";
-import type { Dataset, DocumentItem, Graph, Model, Source } from "../types/catalog";
+import type {
+  Dataset,
+  DocumentItem,
+  EnvironmentalVariable,
+  Graph,
+  Model,
+  Result,
+  Source,
+} from "../types/catalog";
 
 interface CatalogData {
   datasets: Dataset[];
   models: Model[];
   documents: DocumentItem[];
   sources: Source[];
+  variables: EnvironmentalVariable[];
+  results: Result[];
   graph: Graph;
 }
 
@@ -18,14 +28,16 @@ export function useCatalog() {
 
   const load = useCallback(async () => {
     try {
-      const [datasets, models, documents, sources, graph] = await Promise.all([
+      const [datasets, models, documents, sources, variables, results, graph] = await Promise.all([
         catalogApi.datasets(),
         catalogApi.models(),
         catalogApi.documents(),
         catalogApi.sources(),
+        catalogApi.variables(),
+        catalogApi.results(),
         catalogApi.graph(),
       ]);
-      setData({ datasets, models, documents, sources, graph });
+      setData({ datasets, models, documents, sources, variables, results, graph });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {

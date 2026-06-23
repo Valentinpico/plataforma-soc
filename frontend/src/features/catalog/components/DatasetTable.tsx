@@ -4,11 +4,12 @@ import type { Dataset } from "../types/catalog";
 
 interface Props {
   datasets: Dataset[];
+  canEdit: boolean;
   onEdit: (d: Dataset) => void;
   onDelete: (d: Dataset) => void;
 }
 
-export function DatasetTable({ datasets, onEdit, onDelete }: Props) {
+export function DatasetTable({ datasets, canEdit, onEdit, onDelete }: Props) {
   return (
     <table className="w-full border-collapse text-sm">
       <thead>
@@ -16,7 +17,7 @@ export function DatasetTable({ datasets, onEdit, onDelete }: Props) {
           <th className="py-2 font-medium">Nombre</th>
           <th className="py-2 font-medium">Tipo</th>
           <th className="py-2 text-right font-medium">Registros</th>
-          <th className="py-2" />
+          {canEdit && <th className="py-2" />}
         </tr>
       </thead>
       <tbody>
@@ -27,12 +28,14 @@ export function DatasetTable({ datasets, onEdit, onDelete }: Props) {
             <td className="py-2 pr-2 text-right font-mono text-muted">
               {d.recordCount?.toLocaleString() ?? "—"}
             </td>
-            <td className="py-2">
-              <div className="flex justify-end gap-2">
-                <Button variant="ghost" onClick={() => onEdit(d)}>Editar</Button>
-                <Button variant="danger" onClick={() => onDelete(d)}>Borrar</Button>
-              </div>
-            </td>
+            {canEdit && (
+              <td className="py-2">
+                <div className="flex justify-end gap-2">
+                  <Button variant="ghost" onClick={() => onEdit(d)}>Editar</Button>
+                  <Button variant="danger" onClick={() => onDelete(d)}>Borrar</Button>
+                </div>
+              </td>
+            )}
           </tr>
         ))}
       </tbody>

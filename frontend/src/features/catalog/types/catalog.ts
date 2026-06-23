@@ -33,10 +33,28 @@ export interface Model {
   scheme?: string;
 }
 
+export interface EnvironmentalVariable {
+  id: number;
+  name: string;
+  unit?: string;
+  description?: string;
+}
+
+export interface Result {
+  id: number;
+  scope?: string;
+  rmse?: number;
+  r2?: number;
+  model?: Model;
+}
+
 export interface DocumentItem {
   id: number;
   title: string;
   type?: string;
+  authors?: string;
+  description?: string;
+  filePath?: string;
 }
 
 export interface GraphNode {

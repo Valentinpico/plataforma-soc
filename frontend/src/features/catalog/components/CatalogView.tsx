@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAdmin } from "../../../shared/auth/AdminContext";
 import { Button } from "../../../shared/components/Button";
 import { ConfirmModal } from "../../../shared/components/ConfirmModal";
+import { Tabs } from "../../../shared/components/Tabs";
 import { useCatalog } from "../hooks/useCatalog";
 import { useDatasetActions } from "../hooks/useDatasetActions";
 import { useDocumentActions } from "../hooks/useDocumentActions";
@@ -17,12 +18,20 @@ import { ModelDetailModal } from "./ModelDetailModal";
 import { ModelList } from "./ModelList";
 import { ResourceList } from "./ResourceList";
 
+const TABS = [
+  { id: "grafo", label: "Grafo" },
+  { id: "datos", label: "Datos" },
+  { id: "modelos", label: "Modelos" },
+  { id: "documentos", label: "Documentos" },
+];
+
 export function CatalogView() {
   const { isAdmin } = useAdmin();
   const { data, loading, error, reload } = useCatalog();
   const datasetActions = useDatasetActions(reload);
   const documentActions = useDocumentActions(reload);
 
+  const [tab, setTab] = useState("grafo");
   const [editing, setEditing] = useState<Dataset | null | undefined>(undefined);
   const [deleting, setDeleting] = useState<Dataset | null>(null);
   const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
@@ -44,7 +53,7 @@ export function CatalogView() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {!isAdmin && (
         <p className="rounded-md bg-surface-2 px-3 py-2 text-sm text-muted">
           Modo lectura. Usá <span className="text-token">“Administrar”</span> (arriba) para
@@ -52,66 +61,73 @@ export function CatalogView() {
         </p>
       )}
 
-      <section className="rounded-xl border border-border bg-surface-2 p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-display text-lg text-token">Grafo de conocimiento</h2>
-          <span className="text-xs text-muted">Arrastrá para mover · rueda / +− para zoom</span>
-        </div>
-        <GraphView graph={data.graph} />
-      </section>
+      <Tabs tabs={TABS} active={tab} onChange={setTab} />
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <section>
+      {tab === "grafo" && (
+        <section className="rounded-xl border border-border bg-surface-2 p-4">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="font-display text-lg text-token">Datasets</h2>
-            {isAdmin && <Button onClick={() => setEditing(null)}>+ Nuevo</Button>}
+            <h2 className="font-display text-lg text-token">Grafo de conocimiento</h2>
+            <span className="text-xs text-muted">Pasá el mouse para ver · arrastrá / zoom</span>
           </div>
-          <DatasetTable
-            datasets={data.datasets}
-            canEdit={isAdmin}
-            onEdit={setEditing}
-            onDelete={setDeleting}
-          />
+          <GraphView graph={data.graph} />
         </section>
+      )}
 
-        <div className="space-y-6">
-
-          <section>
-            <h3 className="mb-2 font-display text-base text-token">
-              Modelos <span className="text-muted">({data.models.length})</span>
-            </h3>
-            <ModelList models={data.models} onSelect={setViewingModel} />
-          </section>
-
+      {tab === "datos" && (
+        <div className="space-y-8">
           <section>
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="font-display text-base text-token">
-                Documentos <span className="text-muted">({data.documents.length})</span>
-              </h3>
-              {isAdmin && <Button onClick={() => setEditingDoc(null)}>+ Subir</Button>}
+              <h2 className="font-display text-lg text-token">Datasets</h2>
+              {isAdmin && <Button onClick={() => setEditing(null)}>+ Nuevo</Button>}
             </div>
-            <DocumentList documents={data.documents} onSelect={setViewingDoc} />
+            <DatasetTable
+              datasets={data.datasets}
+              canEdit={isAdmin}
+              onEdit={setEditing}
+              onDelete={setDeleting}
+            />
+          </section>
+          <div className="grid gap-8 sm:grid-cols-2">
+            <ResourceList
+              title="Variables ambientales"
+              items={data.variables.map((v) => (v.unit ? `${v.name} (${v.unit})` : v.name))}
+            />
+            <ResourceList
+              title="Fuentes"
+              items={data.sources.map((s) => (s.type ? `${s.name} · ${s.type}` : s.name))}
+            />
+          </div>
+        </div>
+      )}
+
+      {tab === "modelos" && (
+        <div className="space-y-8">
+          <section>
+            <h2 className="mb-2 font-display text-lg text-token">
+              Modelos <span className="text-muted">({data.models.length})</span>
+            </h2>
+            <ModelList models={data.models} onSelect={setViewingModel} />
+          </section>
+          <section>
+            <h2 className="mb-3 font-display text-lg text-token">Resultados — métricas en prueba</h2>
+            <MetricsTable results={data.results} />
           </section>
         </div>
-      </div>
+      )}
 
-      <section>
-        <h2 className="mb-3 font-display text-lg text-token">Resultados — métricas en prueba</h2>
-        <MetricsTable results={data.results} />
-      </section>
+      {tab === "documentos" && (
+        <section>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="font-display text-lg text-token">
+              Documentos <span className="text-muted">({data.documents.length})</span>
+            </h2>
+            {isAdmin && <Button onClick={() => setEditingDoc(null)}>+ Subir</Button>}
+          </div>
+          <DocumentList documents={data.documents} onSelect={setViewingDoc} />
+        </section>
+      )}
 
-      <div className="grid gap-8 sm:grid-cols-2">
-        <ResourceList
-          title="Variables ambientales"
-          items={data.variables.map((v) => (v.unit ? `${v.name} (${v.unit})` : v.name))}
-        />
-        <ResourceList
-          title="Fuentes"
-          items={data.sources.map((s) => (s.type ? `${s.name} · ${s.type}` : s.name))}
-        />
-      </div>
-
-      {/* Datasets */}
+      {/* Modales (siempre montados) */}
       <DatasetFormModal
         open={editing !== undefined}
         dataset={editing ?? null}
@@ -127,7 +143,6 @@ export function CatalogView() {
         onClose={() => setDeleting(null)}
       />
 
-      {/* Documentos */}
       <ModelDetailModal model={viewingModel} onClose={() => setViewingModel(null)} />
 
       <DocumentDetailModal

@@ -13,6 +13,15 @@ const COLORS: Record<string, string> = {
   Documento: "#8a8170",
 };
 
+const LEGEND: [string, string][] = [
+  ["Fuente", "Fuente"],
+  ["Dataset", "Dataset"],
+  ["VariableAmbiental", "Variable"],
+  ["Modelo", "Modelo"],
+  ["Resultado", "Resultado"],
+  ["Documento", "Documento"],
+];
+
 const W = 1000;
 const H = 560;
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -23,9 +32,9 @@ export function GraphView({ graph }: { graph: Graph }) {
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [view, setView] = useState({ x: 0, y: 0, k: 1 });
+  const [hover, setHover] = useState<string | null>(null);
   const drag = useRef<{ x: number; y: number } | null>(null);
 
-  // Zoom con rueda (listener no-pasivo para poder preventDefault).
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
@@ -70,22 +79,62 @@ export function GraphView({ graph }: { graph: Graph }) {
             const a = pos.get(e.source);
             const b = pos.get(e.target);
             if (!a || !b) return null;
-            return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--border)" strokeWidth={0.8} />;
+            const on = hover && (e.source === hover || e.target === hover);
+            return (
+              <line
+                key={i}
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke={on ? "var(--accent)" : "var(--border)"}
+                strokeWidth={on ? 1.4 : 0.7}
+              />
+            );
           })}
           {nodes.map((n) => {
             const p = pos.get(n.id);
             if (!p) return null;
+            const active = hover === n.id;
             return (
-              <g key={n.id}>
-                <circle cx={p.x} cy={p.y} r={7} fill={COLORS[n.label] ?? "var(--text-muted)"} />
-                <text x={p.x} y={p.y - 10} fontSize={8} textAnchor="middle" fill="var(--text-muted)">
-                  {n.caption.slice(0, 18)}
-                </text>
+              <g
+                key={n.id}
+                onMouseEnter={() => setHover(n.id)}
+                onMouseLeave={() => setHover(null)}
+                style={{ cursor: "pointer" }}
+              >
+                <circle cx={p.x} cy={p.y} r={active ? 9 : 6.5} fill={COLORS[n.label] ?? "var(--text-muted)"}>
+                  <title>{n.caption}</title>
+                </circle>
+                {active && (
+                  <text
+                    x={p.x}
+                    y={p.y - 12}
+                    fontSize={12}
+                    textAnchor="middle"
+                    fill="var(--text)"
+                    stroke="var(--surface-2)"
+                    strokeWidth={3}
+                    style={{ paintOrder: "stroke" }}
+                  >
+                    {n.caption}
+                  </text>
+                )}
               </g>
             );
           })}
         </g>
       </svg>
+
+      {/* Leyenda */}
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+        {LEGEND.map(([key, label]) => (
+          <span key={key} className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: COLORS[key] }} />
+            {label}
+          </span>
+        ))}
+      </div>
 
       <div className="absolute right-2 top-2 flex gap-1">
         <button

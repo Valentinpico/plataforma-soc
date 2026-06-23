@@ -31,7 +31,7 @@ export function computeLayout(
     .map((e) => [index.get(e.source), index.get(e.target)] as const)
     .filter((l): l is readonly [number, number] => l[0] !== undefined && l[1] !== undefined);
 
-  const k = Math.sqrt((width * height) / n) * 0.6; // distancia ideal (llena el área)
+  const k = Math.sqrt((width * height) / n) * 0.85; // distancia ideal (llena el área)
   const iterations = 250;
   const marginX = width * 0.04;
   const marginY = height * 0.06;

@@ -16,5 +16,7 @@ frontend/dist/
 
 # tooling / transitorios
 .atl/
+# instrucciones del agente (no es parte del entregable)
+CLAUDE.md
 # carpeta original (duplicada en data/, será eliminada)
 Productos/

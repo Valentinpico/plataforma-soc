@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens semánticos — paleta tierra/científica. Cambiar acá, no en componentes. */
+:root {
+  --bg: #f6f2ea;
+  --surface: #fbf9f4;
+  --surface-2: #efe9dd;
+  --text: #2b2622;
+  --text-muted: #6b6256;
+  --border: #e2dacb;
+  --accent: #3f6b4f;
+  --accent-muted: #e4eee6;
+  --on-accent: #fbf9f4;
+  --success: #3f6b4f;
+  --success-bg: #e4eee6;
+  --warning: #9c6a16;
+  --warning-bg: #f5ebd6;
+  --error: #a8412f;
+  --error-bg: #f5e0da;
+  --overlay: rgba(30, 26, 22, 0.45);
+}
+
+[data-dark="true"] {
+  --bg: #181612;
+  --surface: #221f19;
+  --surface-2: #2c2820;
+  --text: #ece6da;
+  --text-muted: #a39a88;
+  --border: #393428;
+  --accent: #8fb89a;
+  --accent-muted: #29342c;
+  --on-accent: #181612;
+  --success: #8fb89a;
+  --success-bg: #29342c;
+  --warning: #d8a850;
+  --warning-bg: #382f1d;
+  --error: #d98a76;
+  --error-bg: #382420;
+  --overlay: rgba(0, 0, 0, 0.6);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "IBM Plex Sans", sans-serif;
+}

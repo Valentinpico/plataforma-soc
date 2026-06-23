@@ -24,6 +24,6 @@ export const team: Member[] = [
   {
     name: "Ing. Valentin Pico",
     role: "Ingeniero de software — desarrollo de la plataforma",
-    org: "Profesional contratado — PIS-24-09",
+    org: "Escuela Politécnica Nacional",
   },
 ];

@@ -5,7 +5,7 @@ import { ConfirmModal } from "../../../shared/components/ConfirmModal";
 import { useCatalog } from "../hooks/useCatalog";
 import { useDatasetActions } from "../hooks/useDatasetActions";
 import { useDocumentActions } from "../hooks/useDocumentActions";
-import type { Dataset, DocumentItem } from "../types/catalog";
+import type { Dataset, DocumentItem, Model } from "../types/catalog";
 import { DatasetFormModal } from "./DatasetFormModal";
 import { DatasetTable } from "./DatasetTable";
 import { DocumentDetailModal } from "./DocumentDetailModal";
@@ -13,6 +13,8 @@ import { DocumentFormModal } from "./DocumentFormModal";
 import { DocumentList } from "./DocumentList";
 import { GraphView } from "./GraphView";
 import { MetricsTable } from "./MetricsTable";
+import { ModelDetailModal } from "./ModelDetailModal";
+import { ModelList } from "./ModelList";
 import { ResourceList } from "./ResourceList";
 
 export function CatalogView() {
@@ -24,6 +26,7 @@ export function CatalogView() {
   const [editing, setEditing] = useState<Dataset | null | undefined>(undefined);
   const [deleting, setDeleting] = useState<Dataset | null>(null);
   const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
+  const [viewingModel, setViewingModel] = useState<Model | null>(null);
   const [editingDoc, setEditingDoc] = useState<DocumentItem | null | undefined>(undefined);
   const [deletingDoc, setDeletingDoc] = useState<DocumentItem | null>(null);
 
@@ -71,7 +74,12 @@ export function CatalogView() {
             />
           </section>
 
-          <ResourceList title="Modelos" items={data.models.map((m) => m.name)} />
+          <section>
+            <h3 className="mb-2 font-display text-base text-token">
+              Modelos <span className="text-muted">({data.models.length})</span>
+            </h3>
+            <ModelList models={data.models} onSelect={setViewingModel} />
+          </section>
 
           <section>
             <div className="mb-2 flex items-center justify-between">
@@ -118,6 +126,8 @@ export function CatalogView() {
       />
 
       {/* Documentos */}
+      <ModelDetailModal model={viewingModel} onClose={() => setViewingModel(null)} />
+
       <DocumentDetailModal
         doc={viewingDoc}
         onClose={() => setViewingDoc(null)}

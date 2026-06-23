@@ -31,6 +31,11 @@ export interface Model {
   name: string;
   architecture?: string;
   scheme?: string;
+  framework?: string;
+  codePointer?: string;
+  description?: string;
+  datasets?: Dataset[];
+  results?: Result[];
 }
 
 export interface EnvironmentalVariable {

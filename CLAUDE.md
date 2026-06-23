@@ -186,6 +186,28 @@ No duplicar utilidades que ya existen en `Shared/`.
 
 ---
 
+## Testing — TDD strict
+
+**De acá en más: TDD strict.** Test primero (rojo), código (verde), refactor. Toda
+lógica de negocio nueva lleva test.
+
+Comandos (corren en contenedor):
+
+```bash
+# Backend (xUnit + EF InMemory)
+docker compose run --rm backend dotnet test tests/SocPlatform.Tests.csproj
+
+# Frontend (Vitest + Testing Library)
+docker compose run --rm frontend npm test
+```
+
+- Backend: proyecto `backend/tests/`. Servicios con `AppDbContext` InMemory + dobles
+  (ver `FakeGraphService`). El API excluye `tests/**` de su compilación.
+- Frontend: `*.test.ts(x)` junto al código. Hooks de acciones se testean mockeando
+  `catalogApi`; utilidades puras directo.
+- Qué se testea: validaciones de dominio, errores (not-found/validation), que los
+  hooks de acciones retornen boolean y no lancen, utilidades puras.
+
 ## Git
 
 - **Un solo repo** en la raíz `epn/`. Backend y frontend van al mismo remote.

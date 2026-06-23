@@ -1,0 +1,66 @@
+services:
+  postgres:
+    # PostGIS multi-arch (arm64 nativo en Mac Apple Silicon). Cubre repositorio
+    # (Fase 1) + geometrías (Fase 2) sin cambiar imagen.
+    image: imresamu/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-soc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-soc}
+      POSTGRES_DB: ${POSTGRES_DB:-soc}
+    ports:
+      - "5433:5432"   # 5433 en host: 5432 ya ocupado por otro Postgres local
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-soc}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-soc_neo4j_pass}
+    ports:
+      - "7474:7474"   # browser
+      - "7687:7687"   # bolt
+    volumes:
+      - neo4jdata:/data
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-soc};Username=${POSTGRES_USER:-soc};Password=${POSTGRES_PASSWORD:-soc}"
+      Neo4j__Uri: "bolt://neo4j:7687"
+      Neo4j__User: ${NEO4J_USER:-neo4j}
+      Neo4j__Password: ${NEO4J_PASSWORD:-soc_neo4j_pass}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - backend_obj:/app/obj   # no clobbear restore con el bind mount
+      - backend_bin:/app/bin
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8080
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules      # node_modules del contenedor, no del host
+
+volumes:
+  pgdata:
+  neo4jdata:
+  backend_obj:
+  backend_bin:

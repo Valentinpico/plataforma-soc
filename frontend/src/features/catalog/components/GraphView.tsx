@@ -106,7 +106,7 @@ export function GraphView({ graph }: { graph: Graph }) {
                 <circle cx={p.x} cy={p.y} r={active ? 9 : 6.5} fill={COLORS[n.label] ?? "var(--text-muted)"}>
                   <title>{n.caption}</title>
                 </circle>
-                {active && (
+                {active ? (
                   <text
                     x={p.x}
                     y={p.y - 12}
@@ -118,6 +118,17 @@ export function GraphView({ graph }: { graph: Graph }) {
                     style={{ paintOrder: "stroke" }}
                   >
                     {n.caption}
+                  </text>
+                ) : (
+                  <text
+                    x={p.x}
+                    y={p.y - 10}
+                    fontSize={7.5}
+                    textAnchor="middle"
+                    fill="var(--text-muted)"
+                    opacity={0.4}
+                  >
+                    {n.caption.slice(0, 16)}
                   </text>
                 )}
               </g>

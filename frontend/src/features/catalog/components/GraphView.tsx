@@ -43,8 +43,10 @@ export function GraphView({ graph }: { graph: Graph }) {
     e.currentTarget.setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: ReactPointerEvent<SVGSVGElement>) => {
-    if (!drag.current) return;
-    setView((v) => ({ ...v, x: e.clientX - drag.current!.x, y: e.clientY - drag.current!.y }));
+    const d = drag.current;
+    if (!d) return;
+    const { clientX, clientY } = e;
+    setView((v) => ({ ...v, x: clientX - d.x, y: clientY - d.y }));
   };
   const onPointerUp = () => {
     drag.current = null;

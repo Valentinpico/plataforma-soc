@@ -10,4 +10,8 @@ public class Document
     public string? FilePath { get; set; }
     public string? Authors { get; set; }
     public DateOnly? PublishedOn { get; set; }
+
+    // Qué documenta este documento (para el grafo: relación DOCUMENTA).
+    public List<Model> Models { get; set; } = [];
+    public List<Dataset> Datasets { get; set; } = [];
 }

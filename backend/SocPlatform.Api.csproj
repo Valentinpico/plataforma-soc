@@ -11,4 +11,10 @@
     <PackageReference Include="Neo4j.Driver" Version="5.26.0" />
   </ItemGroup>
 
+  <!-- El proyecto de tests vive en tests/ y se compila aparte; excluirlo del API. -->
+  <ItemGroup>
+    <Compile Remove="tests/**/*.cs" />
+    <Content Remove="tests/**/*" />
+  </ItemGroup>
+
 </Project>

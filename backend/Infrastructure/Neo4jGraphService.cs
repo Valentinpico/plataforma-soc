@@ -28,7 +28,8 @@ public class Neo4jGraphService(IDriver driver, IServiceScopeFactory scopeFactory
             .Include(d => d.Variables).ToListAsync();
         var models = await db.Models.AsNoTracking()
             .Include(m => m.Datasets).Include(m => m.Results).ToListAsync();
-        var docs = await db.Documents.AsNoTracking().ToListAsync();
+        var docs = await db.Documents.AsNoTracking()
+            .Include(d => d.Models).Include(d => d.Datasets).ToListAsync();
 
         await using var session = driver.AsyncSession();
         await session.ExecuteWriteAsync(async tx =>
@@ -75,6 +76,17 @@ public class Neo4jGraphService(IDriver driver, IServiceScopeFactory scopeFactory
                     await tx.RunAsync(
                         "MATCH (a:Modelo {id:$m}),(b:Resultado {id:$r}) CREATE (a)-[:PRODUCE]->(b)",
                         new { m = m.Id, r = r.Id });
+            }
+            foreach (var doc in docs)
+            {
+                foreach (var m in doc.Models)
+                    await tx.RunAsync(
+                        "MATCH (a:Documento {id:$d}),(b:Modelo {id:$m}) CREATE (a)-[:DOCUMENTA]->(b)",
+                        new { d = doc.Id, m = m.Id });
+                foreach (var ds in doc.Datasets)
+                    await tx.RunAsync(
+                        "MATCH (a:Documento {id:$d}),(b:Dataset {id:$ds}) CREATE (a)-[:DOCUMENTA]->(b)",
+                        new { d = doc.Id, ds = ds.Id });
             }
         });
     }

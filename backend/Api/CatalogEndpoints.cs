@@ -32,5 +32,36 @@ public static class CatalogEndpoints
             await s.DeleteDatasetAsync(id);
             return Results.NoContent();
         });
+
+        // Gestión de documentos (con carga de archivo multipart)
+        g.MapPost("/documents", async (HttpRequest req, CatalogService s, IWebHostEnvironment env) =>
+        {
+            var (input, file) = ReadDocumentForm(await req.ReadFormAsync());
+            var doc = await s.CreateDocumentAsync(input, file, env.ContentRootPath);
+            return Results.Created($"/api/documents/{doc.Id}", doc);
+        }).DisableAntiforgery();
+        g.MapPut("/documents/{id:int}", async (int id, HttpRequest req, CatalogService s, IWebHostEnvironment env) =>
+        {
+            var (input, file) = ReadDocumentForm(await req.ReadFormAsync());
+            return await s.UpdateDocumentAsync(id, input, file, env.ContentRootPath);
+        }).DisableAntiforgery();
+        g.MapDelete("/documents/{id:int}", async (int id, CatalogService s) =>
+        {
+            await s.DeleteDocumentAsync(id);
+            return Results.NoContent();
+        });
     }
+
+    private static (DocumentInput, IFormFile?) ReadDocumentForm(IFormCollection form)
+    {
+        var input = new DocumentInput(
+            form["title"].ToString(),
+            NullIfEmpty(form["type"]),
+            NullIfEmpty(form["authors"]),
+            NullIfEmpty(form["description"]),
+            NullIfEmpty(form["link"]));
+        return (input, form.Files.GetFile("file"));
+    }
+
+    private static string? NullIfEmpty(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
 }

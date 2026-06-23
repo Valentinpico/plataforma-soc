@@ -12,5 +12,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Result> Results => Set<Result>();
     public DbSet<Document> Documents => Set<Document>();
 
-    // Relaciones N..N (Dataset-Variable, Dataset-Model) las infiere EF Core.
+    protected override void OnModelCreating(ModelBuilder b)
+    {
+        // Document.Models / Document.Datasets son navegaciones sin inverso:
+        // forzar many-to-many (join table) en vez del uno-a-muchos que EF infiere.
+        b.Entity<Document>().HasMany(d => d.Models).WithMany();
+        b.Entity<Document>().HasMany(d => d.Datasets).WithMany();
+    }
 }

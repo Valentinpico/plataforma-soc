@@ -15,6 +15,14 @@ public record DatasetInput(
     int? RecordCount,
     int? SourceId);
 
+/// <summary>Datos de entrada para crear/editar un Documento.</summary>
+public record DocumentInput(
+    string Title,
+    string? Type,
+    string? Authors,
+    string? Description,
+    string? Link);
+
 /// <summary>Catálogo del repositorio: lecturas + gestión. La lógica vive acá, no en los endpoints.</summary>
 public class CatalogService(AppDbContext db, IGraphService graph)
 {
@@ -80,6 +88,63 @@ public class CatalogService(AppDbContext db, IGraphService graph)
         db.Datasets.Remove(ds);
         await db.SaveChangesAsync();
         await graph.RebuildAsync();
+    }
+
+    // --- Gestión (Documento) ---
+    public async Task<Document> CreateDocumentAsync(DocumentInput input, IFormFile? file, string contentRoot)
+    {
+        if (string.IsNullOrWhiteSpace(input.Title))
+            throw new ValidationError("El título del documento es obligatorio.");
+
+        var doc = new Document { Title = input.Title };
+        await ApplyDocAsync(doc, input, file, contentRoot);
+        db.Documents.Add(doc);
+        await db.SaveChangesAsync();
+        await graph.RebuildAsync();
+        return doc;
+    }
+
+    public async Task<Document> UpdateDocumentAsync(int id, DocumentInput input, IFormFile? file, string contentRoot)
+    {
+        var doc = await db.Documents.FindAsync(id)
+            ?? throw new NotFoundError($"Documento {id} no existe.");
+        if (string.IsNullOrWhiteSpace(input.Title))
+            throw new ValidationError("El título del documento es obligatorio.");
+        await ApplyDocAsync(doc, input, file, contentRoot);
+        await db.SaveChangesAsync();
+        await graph.RebuildAsync();
+        return doc;
+    }
+
+    public async Task DeleteDocumentAsync(int id)
+    {
+        var doc = await db.Documents.FindAsync(id)
+            ?? throw new NotFoundError($"Documento {id} no existe.");
+        db.Documents.Remove(doc);
+        await db.SaveChangesAsync();
+        await graph.RebuildAsync();
+    }
+
+    private static async Task ApplyDocAsync(Document doc, DocumentInput input, IFormFile? file, string contentRoot)
+    {
+        doc.Title = input.Title;
+        doc.Type = input.Type;
+        doc.Authors = input.Authors;
+        doc.Description = input.Description;
+
+        if (file is { Length: > 0 })
+        {
+            var dir = Path.Combine(contentRoot, "data", "documentos", "uploads");
+            Directory.CreateDirectory(dir);
+            var safe = Path.GetFileName(file.FileName); // evita traversal
+            await using var fs = File.Create(Path.Combine(dir, safe));
+            await file.CopyToAsync(fs);
+            doc.FilePath = $"data/documentos/uploads/{safe}";
+        }
+        else if (!string.IsNullOrWhiteSpace(input.Link))
+        {
+            doc.FilePath = input.Link;
+        }
     }
 
     private async Task ValidateAsync(DatasetInput input)

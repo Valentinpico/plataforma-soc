@@ -40,10 +40,12 @@ services:
       Neo4j__Uri: "bolt://neo4j:7687"
       Neo4j__User: ${NEO4J_USER:-neo4j}
       Neo4j__Password: ${NEO4J_PASSWORD:-soc_neo4j_pass}
+      Admin__Password: ${ADMIN_PASSWORD:-soc-admin-2026}
     ports:
       - "8080:8080"
     volumes:
       - ./backend:/app
+      - ./data:/app/data       # PDFs locales servidos en /files (lectura + uploads)
       - backend_obj:/app/obj   # no clobbear restore con el bind mount
       - backend_bin:/app/bin
 

@@ -52,27 +52,29 @@ export function CatalogView() {
         </p>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-5">
-        <section className="flex flex-col rounded-xl border border-border bg-surface-2 p-4 lg:col-span-3">
-          <h2 className="mb-3 font-display text-lg text-token">Grafo de conocimiento</h2>
-          <div className="flex flex-1 items-center justify-center">
-            <GraphView graph={data.graph} />
+      <section className="rounded-xl border border-border bg-surface-2 p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-display text-lg text-token">Grafo de conocimiento</h2>
+          <span className="text-xs text-muted">Arrastrá para mover · rueda / +− para zoom</span>
+        </div>
+        <GraphView graph={data.graph} />
+      </section>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <section>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="font-display text-lg text-token">Datasets</h2>
+            {isAdmin && <Button onClick={() => setEditing(null)}>+ Nuevo</Button>}
           </div>
+          <DatasetTable
+            datasets={data.datasets}
+            canEdit={isAdmin}
+            onEdit={setEditing}
+            onDelete={setDeleting}
+          />
         </section>
 
-        <div className="space-y-6 lg:col-span-2">
-          <section>
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="font-display text-lg text-token">Datasets</h2>
-              {isAdmin && <Button onClick={() => setEditing(null)}>+ Nuevo</Button>}
-            </div>
-            <DatasetTable
-              datasets={data.datasets}
-              canEdit={isAdmin}
-              onEdit={setEditing}
-              onDelete={setDeleting}
-            />
-          </section>
+        <div className="space-y-6">
 
           <section>
             <h3 className="mb-2 font-display text-base text-token">

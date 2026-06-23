@@ -25,8 +25,10 @@ public static class CatalogEndpoints
             var ds = await s.CreateDatasetAsync(input);
             return Results.Created($"/api/datasets/{ds.Id}", ds);
         });
+
         g.MapPut("/datasets/{id:int}", (int id, DatasetInput input, CatalogService s) =>
             s.UpdateDatasetAsync(id, input));
+
         g.MapDelete("/datasets/{id:int}", async (int id, CatalogService s) =>
         {
             await s.DeleteDatasetAsync(id);
@@ -40,22 +42,26 @@ public static class CatalogEndpoints
             var doc = await s.CreateDocumentAsync(input, file, env.ContentRootPath);
             return Results.Created($"/api/documents/{doc.Id}", doc);
         }).DisableAntiforgery();
+
         g.MapPut("/documents/{id:int}", async (int id, HttpRequest req, CatalogService s, IWebHostEnvironment env) =>
         {
             var (input, file) = ReadDocumentForm(await req.ReadFormAsync());
             return await s.UpdateDocumentAsync(id, input, file, env.ContentRootPath);
         }).DisableAntiforgery();
+
         g.MapDelete("/documents/{id:int}", async (int id, CatalogService s) =>
         {
             await s.DeleteDocumentAsync(id);
             return Results.NoContent();
         });
-    }
+
 
         // Gestión de fuentes
         g.MapPost("/sources", async (SourceInput i, CatalogService s) =>
             Results.Created("/api/sources", await s.CreateSourceAsync(i)));
+        
         g.MapPut("/sources/{id:int}", (int id, SourceInput i, CatalogService s) => s.UpdateSourceAsync(id, i));
+        
         g.MapDelete("/sources/{id:int}", async (int id, CatalogService s) =>
         {
             await s.DeleteSourceAsync(id);
@@ -65,7 +71,9 @@ public static class CatalogEndpoints
         // Gestión de variables
         g.MapPost("/variables", async (VariableInput i, CatalogService s) =>
             Results.Created("/api/variables", await s.CreateVariableAsync(i)));
+        
         g.MapPut("/variables/{id:int}", (int id, VariableInput i, CatalogService s) => s.UpdateVariableAsync(id, i));
+        
         g.MapDelete("/variables/{id:int}", async (int id, CatalogService s) =>
         {
             await s.DeleteVariableAsync(id);
@@ -75,7 +83,9 @@ public static class CatalogEndpoints
         // Gestión de modelos
         g.MapPost("/models", async (ModelInput i, CatalogService s) =>
             Results.Created("/api/models", await s.CreateModelAsync(i)));
+        
         g.MapPut("/models/{id:int}", (int id, ModelInput i, CatalogService s) => s.UpdateModelAsync(id, i));
+        
         g.MapDelete("/models/{id:int}", async (int id, CatalogService s) =>
         {
             await s.DeleteModelAsync(id);

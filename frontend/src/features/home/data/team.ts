@@ -21,9 +21,9 @@ export const team: Member[] = [
     role: "Investigador — modelos GNN y datos",
     org: "Escuela Politécnica Nacional",
   },
-  {
+/*   {
     name: "Ing. Valentin Pico",
     role: "Ingeniero de software — desarrollo de la plataforma",
     org: "Escuela Politécnica Nacional",
-  },
+  }, */
 ];

@@ -2,43 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tokens semánticos — paleta tierra/científica. Cambiar acá, no en componentes. */
+/* Tokens semánticos — identidad institucional EPN (granate + azul).
+   Cambiar acá, no en componentes. Valores granate/azul aproximados a la marca
+   EPN; ajustar en un solo lugar si Comunicación entrega los hex oficiales. */
 :root {
-  --bg: #f6f2ea;
-  --surface: #fbf9f4;
-  --surface-2: #efe9dd;
-  --text: #2b2622;
-  --text-muted: #6b6256;
-  --border: #e2dacb;
-  --accent: #3f6b4f;
-  --accent-muted: #e4eee6;
-  --on-accent: #fbf9f4;
+  --bg: #f5f3f1;
+  --surface: #ffffff;
+  --surface-2: #ece8e6;
+  --text: #20191b;
+  --text-muted: #6a5f62;
+  --border: #e0d9d7;
+  --accent: #6f1d2b; /* granate EPN */
+  --accent-light: #e6a6ad; /* granate claro — texto/acentos legibles sobre fondos oscuros */
+  --accent-muted: #f1e1e3;
+  --on-accent: #ffffff;
+  --brand: #15324f; /* azul EPN — encabezados y bandas */
+  --brand-bg: #102a44;
+  --on-brand: #f5f3f1;
   --success: #3f6b4f;
   --success-bg: #e4eee6;
   --warning: #9c6a16;
   --warning-bg: #f5ebd6;
-  --error: #a8412f;
+  --error: #b23b2e;
   --error-bg: #f5e0da;
-  --overlay: rgba(30, 26, 22, 0.45);
+  --overlay: rgba(20, 16, 18, 0.45);
 }
 
 [data-dark="true"] {
-  --bg: #181612;
-  --surface: #221f19;
-  --surface-2: #2c2820;
-  --text: #ece6da;
-  --text-muted: #a39a88;
-  --border: #393428;
-  --accent: #8fb89a;
-  --accent-muted: #29342c;
-  --on-accent: #181612;
+  --bg: #161214;
+  --surface: #1f1a1c;
+  --surface-2: #2a2326;
+  --text: #ece4e2;
+  --text-muted: #a89a9d;
+  --border: #382f32;
+  --accent: #d98a96; /* granate aclarado para contraste en oscuro */
+  --accent-light: #e6a6ad; /* granate claro — texto/acentos sobre fondos oscuros */
+  --accent-muted: #34242a;
+  --on-accent: #161214;
+  --brand: #7aa2cf; /* azul aclarado en oscuro */
+  --brand-bg: #0e2336;
+  --on-brand: #ece4e2;
   --success: #8fb89a;
   --success-bg: #29342c;
   --warning: #d8a850;
   --warning-bg: #382f1d;
-  --error: #d98a76;
-  --error-bg: #382420;
+  --error: #e0917f;
+  --error-bg: #3a221f;
   --overlay: rgba(0, 0, 0, 0.6);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -46,4 +60,94 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: "IBM Plex Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Grano de papel — textura sutil que quita el aspecto plano/digital. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Reveal escalonado: carga (hero) y al entrar en viewport (secciones). */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reveal-up {
+  animation: revealUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.on-scroll {
+  opacity: 0;
+}
+.on-scroll.is-visible {
+  animation: revealUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Tabular numerals para los números de sección y métricas. */
+.nums {
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* Flotación lenta para elementos decorativos (motivo de grafo). */
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+.float-slow {
+  animation: floatY 7s ease-in-out infinite;
+}
+
+/* Marquee infinito (red de colaboración): la pista contiene la lista 2x y se
+   desplaza -50% para un loop sin costuras. Pausa en hover. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+.marquee-mask:hover .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal-up,
+  .on-scroll.is-visible {
+    animation: none;
+  }
+  .on-scroll {
+    opacity: 1;
+  }
 }

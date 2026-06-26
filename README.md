@@ -30,7 +30,6 @@ epn/
 ├── frontend/     → React + TS (arquitectura por features)
 ├── data/         → material real del proyecto (SOC, geo, modelos, documentos)
 ├── docs/         → informes y diagramas
-├── plan/         → plan de fases
 └── docker-compose.yml
 ```
 

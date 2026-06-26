@@ -14,14 +14,13 @@ data/
 ├── modelos/              → modelos GNN del proyecto
 │   ├── notebooks/                        (GraphSAGE, GAT, GATv2 — .ipynb)
 │   └── esquemas/                         (diagramas inductivo/transductivo)
-├── documentos/           → documentación
-│   ├── informes/                         (informes técnicos firmados)
-│   └── oficios-inamhi/                  (solicitud + respuesta de datos SOC)
-└── _archivos/            → .rar redundantes (contenido ya extraído)
+└── documentos/           → documentación
+    ├── informes/                         (informes técnicos firmados)
+    ├── oficios-inamhi/                  (solicitud + respuesta de datos SOC)
+    └── administrativos/                 (modelo de informe de necesidad)
 ```
 
 Notas:
-- Copiado desde la carpeta `Productos/` original (ya eliminada).
 - Se deduplicaron 2 imágenes de esquema repetidas entre productos.
 - Métricas reales de los modelos (R²/MAE/MAPE) están en los informes de
   `documentos/informes/` — falta volcarlas a la tabla `Results`.

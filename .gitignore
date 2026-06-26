@@ -12,11 +12,3 @@ frontend/dist/
 # misc
 .DS_Store
 *.log
-.playwright-mcp/
-
-# tooling / transitorios
-.atl/
-# instrucciones del agente (no es parte del entregable)
-CLAUDE.md
-# carpeta original (duplicada en data/, será eliminada)
-Productos/

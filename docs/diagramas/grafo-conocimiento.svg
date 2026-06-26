@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#333"/>
+    </marker>
+    <marker id="ahd" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#a16207"/>
+    </marker>
+  </defs>
+  <rect width="800" height="600" fill="#ffffff"/>
+  <text x="400" y="42" text-anchor="middle" font-size="22" font-weight="bold" fill="#1e1e1e">Grafo de conocimiento — nodos y relaciones</text>
+
+  <!-- edges first (under nodes) -->
+  <line x1="325" y1="145" x2="212" y2="145" stroke="#333" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="267" y="138" text-anchor="middle" font-size="13" fill="#444">PROVIENE_DE</text>
+
+  <line x1="345" y1="180" x2="216" y2="320" stroke="#333" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="248" y="248" text-anchor="middle" font-size="13" fill="#444">CONTIENE</text>
+
+  <line x1="590" y1="145" x2="477" y2="145" stroke="#333" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="533" y="138" text-anchor="middle" font-size="12" fill="#444">ENTRENADO_CON</text>
+
+  <line x1="665" y1="180" x2="665" y2="318" stroke="#333" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="665" y="254" text-anchor="middle" font-size="13" fill="#444">PRODUCE</text>
+
+  <line x1="400" y1="480" x2="400" y2="184" stroke="#a16207" stroke-width="2" marker-end="url(#ahd)"/>
+  <text x="446" y="334" text-anchor="middle" font-size="13" fill="#a16207">DOCUMENTA</text>
+  <line x1="470" y1="500" x2="612" y2="184" stroke="#a16207" stroke-width="2" marker-end="url(#ahd)"/>
+  <line x1="475" y1="505" x2="588" y2="362" stroke="#a16207" stroke-width="2" marker-end="url(#ahd)"/>
+
+  <!-- nodes -->
+  <rect x="60" y="110" width="150" height="70" rx="10" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2"/>
+  <text x="135" y="152" text-anchor="middle" font-size="18" fill="#1e1e1e">Fuente</text>
+
+  <rect x="325" y="110" width="150" height="70" rx="10" fill="#a5d8ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="400" y="152" text-anchor="middle" font-size="18" fill="#1e1e1e">Dataset</text>
+
+  <rect x="590" y="110" width="150" height="70" rx="10" fill="#d0bfff" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="665" y="152" text-anchor="middle" font-size="18" fill="#1e1e1e">Modelo</text>
+
+  <rect x="60" y="320" width="170" height="70" rx="10" fill="#b2f2bb" stroke="#15803d" stroke-width="2"/>
+  <text x="145" y="362" text-anchor="middle" font-size="15" fill="#1e1e1e">Variable ambiental</text>
+
+  <rect x="590" y="320" width="150" height="70" rx="10" fill="#eebefa" stroke="#a21caf" stroke-width="2"/>
+  <text x="665" y="362" text-anchor="middle" font-size="18" fill="#1e1e1e">Resultado</text>
+
+  <rect x="325" y="480" width="150" height="70" rx="10" fill="#fff3bf" stroke="#f59e0b" stroke-width="2"/>
+  <text x="400" y="522" text-anchor="middle" font-size="18" fill="#1e1e1e">Documento</text>
+
+  <text x="400" y="585" text-anchor="middle" font-size="13" fill="#757575">DOCUMENTA apunta a Modelo, Dataset o Resultado</text>
+</svg>

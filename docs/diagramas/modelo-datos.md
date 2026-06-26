@@ -69,7 +69,7 @@ relacional para consultas estructuradas, grafo para recorrer y graficar relacion
 | Oficios INAMHI | `Fuente` + `Document` (oficio) |
 | geoBoundaries Ecuador | `Dataset` (topografico) — geometría se usa en Fase 2 |
 
-## Decisiones (ponytail)
+## Decisiones de diseño
 
 - **6 entidades**, no más. `Region`/geometría llega en Fase 2 (PostGIS).
 - **EnsureCreated** crea las tablas al arrancar (dev). Sin migraciones aún.

@@ -28,7 +28,20 @@ const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v
 
 export function GraphView({ graph }: { graph: Graph }) {
   const { nodes, edges } = graph;
+  // Layout sobre TODOS los nodos (posiciones estables al filtrar).
   const pos = useMemo(() => computeLayout(nodes, edges, W, H), [nodes, edges]);
+  const typeById = useMemo(() => new Map(nodes.map((n) => [n.id, n.label] as const)), [nodes]);
+
+  // Filtro por tipo de nodo (todos activos por defecto). Click en la leyenda.
+  const [active, setActive] = useState<Set<string>>(() => new Set(Object.keys(COLORS)));
+  const toggle = (key: string) =>
+    setActive((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  const shown = (id: string) => active.has(typeById.get(id) ?? "");
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [view, setView] = useState({ x: 0, y: 0, k: 1 });
@@ -78,7 +91,7 @@ export function GraphView({ graph }: { graph: Graph }) {
           {edges.map((e, i) => {
             const a = pos.get(e.source);
             const b = pos.get(e.target);
-            if (!a || !b) return null;
+            if (!a || !b || !shown(e.source) || !shown(e.target)) return null;
             const on = hover && (e.source === hover || e.target === hover);
             return (
               <line
@@ -94,8 +107,8 @@ export function GraphView({ graph }: { graph: Graph }) {
           })}
           {nodes.map((n) => {
             const p = pos.get(n.id);
-            if (!p) return null;
-            const active = hover === n.id;
+            if (!p || !shown(n.id)) return null;
+            const activeNode = hover === n.id;
             return (
               <g
                 key={n.id}
@@ -103,10 +116,10 @@ export function GraphView({ graph }: { graph: Graph }) {
                 onMouseLeave={() => setHover(null)}
                 style={{ cursor: "pointer" }}
               >
-                <circle cx={p.x} cy={p.y} r={active ? 9 : 6.5} fill={COLORS[n.label] ?? "var(--text-muted)"}>
+                <circle cx={p.x} cy={p.y} r={activeNode ? 9 : 6.5} fill={COLORS[n.label] ?? "var(--text-muted)"}>
                   <title>{n.caption}</title>
                 </circle>
-                {active ? (
+                {activeNode ? (
                   <text
                     x={p.x}
                     y={p.y - 12}
@@ -137,14 +150,27 @@ export function GraphView({ graph }: { graph: Graph }) {
         </g>
       </svg>
 
-      {/* Leyenda */}
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
-        {LEGEND.map(([key, label]) => (
-          <span key={key} className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: COLORS[key] }} />
-            {label}
-          </span>
-        ))}
+      {/* Leyenda = filtro. Click para mostrar/ocultar un tipo. */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="mr-1 text-xs text-muted">Filtrar:</span>
+        {LEGEND.map(([key, label]) => {
+          const isOn = active.has(key);
+          return (
+            <button
+              key={key}
+              onClick={() => toggle(key)}
+              aria-pressed={isOn}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
+                isOn
+                  ? "border-border bg-surface text-token"
+                  : "border-transparent bg-surface-2 text-muted line-through opacity-60"
+              }`}
+            >
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: COLORS[key] }} />
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="absolute right-2 top-2 flex gap-1">

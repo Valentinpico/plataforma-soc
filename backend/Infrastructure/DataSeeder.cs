@@ -176,16 +176,6 @@ public static class DataSeeder
                 Description = "Literatura relacionada: dependencia espacial y NDVI",
                 Datasets = [dsS2],
             },
-            new Document
-            {
-                Title = "A local correlation integral method for outlier detection in spatially correlated functional data (2024)",
-                Type = "paper",
-                Authors = "Sosa, J.; Moraga, P.; Flores, M.; Mateu, J.",
-                PublishedOn = new DateOnly(2024, 1, 1),
-                FilePath = "https://doi.org/10.1007/s00477-023-02624-9",
-                Description = "Literatura relacionada: detección de outliers en datos funcionales espaciales",
-                Datasets = [dsSoc],
-            },
             // Papers Open Access descargados (PDF local en data/documentos/papers).
             new Document
             {
@@ -196,35 +186,6 @@ public static class DataSeeder
                 FilePath = "data/documentos/papers/ndvi-tussock-grasses-2023.pdf",
                 Description = "Descripción espacio-temporal del NDVI y variables hidrometeorológicas",
                 Datasets = [dsS2],
-            },
-            new Document
-            {
-                Title = "Predicting rainfall and irrigation requirements of corn in Ecuador (2023)",
-                Type = "paper",
-                Authors = "Flores, M.; Llambo, Á.; Loza, D.; Naya, S.; Tarrío-Saavedra, J.",
-                PublishedOn = new DateOnly(2023, 1, 1),
-                FilePath = "data/documentos/papers/rainfall-irrigation-corn-2023.pdf",
-                Description = "Literatura relacionada: predicción de precipitación y riego",
-                Datasets = [dsClima],
-            },
-            new Document
-            {
-                Title = "Neural networks / ANFIS for water level forecasting, Andes (2021)",
-                Type = "paper",
-                Authors = "Páliz, P.; Zapata-Ríos, X.; Campozano, L.",
-                PublishedOn = new DateOnly(2021, 1, 1),
-                FilePath = "data/documentos/papers/anfis-water-level-andes-2021.pdf",
-                Description = "Literatura relacionada: redes neuronales y ANFIS para series ambientales",
-                Datasets = [dsClima],
-            },
-            new Document
-            {
-                Title = "GAS-ATT-LSTM for non-stationary time series (2025)",
-                Type = "paper",
-                Authors = "Astudillo, K.; Flores, M.; Soliz, M.; Ferreira, G.; Varela-Aldás, J.",
-                PublishedOn = new DateOnly(2025, 1, 1),
-                FilePath = "data/documentos/papers/gas-att-lstm-2025.pdf",
-                Description = "Literatura relacionada: arquitectura híbrida de deep learning para series",
             },
             new Document
             {

@@ -40,7 +40,7 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-// ponytail: EnsureCreated crea las tablas del modelo al arrancar (dev).
+// EnsureCreated crea las tablas del modelo al arrancar (dev).
 // Ceiling: sin historial de migraciones. Upgrade a EF Migrations
 // (dotnet ef migrations add) antes de la entrega final si se quiere
 // trazabilidad de esquema.

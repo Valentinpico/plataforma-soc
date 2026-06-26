@@ -1,3 +1,4 @@
+import { Badge } from "../../../shared/components/Badge";
 import { Button } from "../../../shared/components/Button";
 
 interface Props<T extends { id: number }> {
@@ -6,6 +7,8 @@ interface Props<T extends { id: number }> {
   canEdit: boolean;
   onEdit: (item: T) => void;
   onDelete: (item: T) => void;
+  display?: "list" | "badges";
+  badgeTone?: "accent" | "neutral";
 }
 
 export function ManagedList<T extends { id: number }>({
@@ -14,7 +17,23 @@ export function ManagedList<T extends { id: number }>({
   canEdit,
   onEdit,
   onDelete,
+  display = "list",
+  badgeTone = "neutral",
 }: Props<T>) {
+  // Modo badges (solo lectura): chips compactos en flex-wrap.
+  if (display === "badges" && !canEdit) {
+    if (items.length === 0) return <p className="text-sm italic text-muted">Sin registros.</p>;
+    return (
+      <div className="flex flex-wrap gap-2">
+        {items.map((it) => (
+          <Badge key={it.id} tone={badgeTone}>
+            {label(it)}
+          </Badge>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <ul className="space-y-1">
       {items.map((it) => (

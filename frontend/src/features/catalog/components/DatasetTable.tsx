@@ -26,7 +26,11 @@ export function DatasetTable({ datasets, canEdit, onEdit, onDelete }: Props) {
             <td className="py-2 pr-2 text-token">{d.name}</td>
             <td className="py-2 pr-2">{d.type && <Badge tone="accent">{d.type}</Badge>}</td>
             <td className="py-2 pr-2 text-right font-mono text-muted">
-              {d.recordCount?.toLocaleString() ?? "—"}
+              {d.recordCount != null ? (
+                d.recordCount.toLocaleString()
+              ) : (
+                <span className="font-sans italic opacity-70">ráster</span>
+              )}
             </td>
             {canEdit && (
               <td className="py-2">

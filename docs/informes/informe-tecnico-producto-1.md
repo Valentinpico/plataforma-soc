@@ -358,11 +358,23 @@ modelos y documentos registrados. Ofrece una lectura inmediata del alcance de la
 información catalogada y da acceso al grafo de conocimiento, a los datos y a los documentos
 descargables.
 
-### 4.4 Proyecto SOC — modelos y resultados
+### 4.4 Proyecto SOC — grafo de conocimiento
+
+![Grafo de conocimiento del proyecto SOC: nodos de fuentes, datasets, variables, modelos, resultados y documentos conectados por sus relaciones, con filtro por tipo de nodo.](../capturas/soc-grafo.png)
+
+*Figura 6. Grafo de conocimiento del proyecto SOC.*
+
+El grafo de conocimiento integra de forma navegable la totalidad de los activos del
+proyecto y sus relaciones. Cada nodo representa una entidad (fuente, dataset, variable
+ambiental, modelo, resultado o documento) y cada arista, una relación de trazabilidad —de
+qué fuente proviene un dataset, con qué datos se entrenó un modelo, qué documento describe
+qué resultado—. La vista permite filtrar por tipo de nodo, desplazarse y hacer zoom.
+
+### 4.5 Proyecto SOC — modelos y resultados
 
 ![Modelos GNN catalogados y tabla de métricas de desempeño por región.](../capturas/soc-modelos.png)
 
-*Figura 6. Modelos GNN catalogados y tabla de métricas de desempeño.*
+*Figura 7. Modelos GNN catalogados y tabla de métricas de desempeño.*
 
 Esta sección cataloga los modelos de redes neuronales de grafos (GraphSAGE, GAT y GATv2,
 en esquemas inductivo y transductivo) y su desempeño en prueba (RMSE y R²) por región.

@@ -97,7 +97,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Columna derecha — motivo de grafo two-tone (nodos granate, aristas claras) */}
+        {/* Columna derecha — motivo de grafo two-tone (nodos teal, aristas claras) */}
         <div className="hidden lg:flex lg:items-center lg:justify-end">
           <GraphMotif
             className="float-slow h-80 w-full text-on-brand/70"

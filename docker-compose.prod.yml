@@ -1,0 +1,91 @@
+# Producción (1 EC2). Front estático servido por Caddy, que además hace de
+# reverse-proxy a la API y resuelve HTTPS (Let's Encrypt) automáticamente.
+# Levantar:  docker compose -f docker-compose.prod.yml up -d --build
+services:
+  # Build one-shot del frontend: compila el SPA (VITE_API_URL vacío = mismo
+  # origin) y deja el dist en el volumen que sirve Caddy. Corre y termina.
+  web-build:
+    image: node:22-alpine
+    working_dir: /app
+    environment:
+      VITE_API_URL: ""        # mismo origin: /api y /files los enruta Caddy → sin CORS
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - web_dist:/out
+    command: sh -c "npm ci || npm install; npm run build && rm -rf /out/* && cp -r dist/. /out/"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      web-build:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?definí SITE_ADDRESS en .env (ej: 1-2-3-4.sslip.io)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - web_dist:/srv/web:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    mem_limit: 512m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-soc};Username=${POSTGRES_USER:-soc};Password=${POSTGRES_PASSWORD:?definí POSTGRES_PASSWORD en .env}"
+      Neo4j__Uri: "bolt://neo4j:7687"
+      Neo4j__User: ${NEO4J_USER:-neo4j}
+      Neo4j__Password: ${NEO4J_PASSWORD:?definí NEO4J_PASSWORD en .env}
+      Admin__Password: ${ADMIN_PASSWORD:?definí ADMIN_PASSWORD en .env}
+    volumes:
+      - ./data:/app/data:ro    # PDFs locales servidos en /files (solo lectura)
+
+  postgres:
+    image: imresamu/postgis:16-3.4
+    restart: unless-stopped
+    mem_limit: 512m
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-soc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definí POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: ${POSTGRES_DB:-soc}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-soc}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5-community
+    restart: unless-stopped
+    mem_limit: 1g
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:?definí NEO4J_PASSWORD en .env}
+      NEO4J_server_memory_heap_max__size: "512m"
+      NEO4J_server_memory_pagecache_size: "256m"
+    volumes:
+      - neo4jdata:/data
+
+volumes:
+  web_dist:
+  pgdata:
+  neo4jdata:
+  caddy_data:
+  caddy_config:

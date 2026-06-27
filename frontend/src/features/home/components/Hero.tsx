@@ -9,12 +9,20 @@ import { GraphMotif } from "./GraphMotif";
 function CoordinatorBadge() {
   return (
     <div className="mt-6 flex items-center gap-3">
-      <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold text-on-accent"
-        style={{ background: "var(--accent)" }}
-      >
-        {initials(coordinator.fullName)}
-      </div>
+      {coordinator.photo ? (
+        <img
+          src={coordinator.photo}
+          alt={coordinator.fullName}
+          className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-accent"
+        />
+      ) : (
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold text-on-accent"
+          style={{ background: "var(--accent)" }}
+        >
+          {initials(coordinator.fullName)}
+        </div>
+      )}
       <div>
         <p className="text-sm font-medium text-on-brand">{coordinator.fullName}</p>
         <p className="text-xs text-on-brand opacity-60">

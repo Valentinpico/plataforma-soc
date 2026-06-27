@@ -22,6 +22,14 @@ export function AboutSection() {
       <div className="relative mx-auto max-w-6xl px-6 py-16">
         <SectionHeader index="01" eyebrow="Sobre el grupo" title="¿Para qué es META?" />
 
+        <div className="on-scroll mb-12 flex justify-center">
+          <img
+            src="/logo-meta.png"
+            alt="Grupo META — Modelización Estocástica Teórica y Aplicada"
+            className="h-40 w-auto sm:h-52"
+          />
+        </div>
+
         <div className="on-scroll grid gap-10 lg:grid-cols-[2fr_1fr]">
           <div className="space-y-4 text-base leading-relaxed text-muted">
             <p>

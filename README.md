@@ -29,7 +29,7 @@ epn/
 ├── backend/      → API .NET 9 (Controller → Service → Repository) + tests/
 ├── frontend/     → React + TS (arquitectura por features)
 ├── data/         → material real del proyecto (SOC, geo, modelos, documentos)
-├── docs/         → informes y diagramas
+├── docs/         → diagramas (arquitectura y modelo de datos)
 └── docker-compose.yml
 ```
 
@@ -90,5 +90,4 @@ El proyecto sigue **TDD**: toda lógica de negocio nueva lleva test.
 
 ## Documentación
 
-- `docs/informes/` — informe mensual y técnico del Producto 1.
-- `docs/diagramas/modelo-datos.md` — modelo de datos y esquema del grafo.
+- `docs/diagramas/` — diagramas de arquitectura, grafo de conocimiento y modelo de datos.

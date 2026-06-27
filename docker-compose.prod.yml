@@ -5,7 +5,7 @@ services:
   # Build one-shot del frontend: compila el SPA (VITE_API_URL vacío = mismo
   # origin) y deja el dist en el volumen que sirve Caddy. Corre y termina.
   web-build:
-    image: node:22-alpine
+    image: node:22
     working_dir: /app
     environment:
       VITE_API_URL: ""        # mismo origin: /api y /files los enruta Caddy → sin CORS
@@ -13,7 +13,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - web_dist:/out
-    command: sh -c "npm ci || npm install; npm run build && rm -rf /out/* && cp -r dist/. /out/"
+    # install limpio: evita el bug de npm con deps opcionales nativas (rollup/esbuild)
+    command: sh -c "rm -rf node_modules package-lock.json; npm install; npm run build && rm -rf /out/* && cp -r dist/. /out/"
 
   caddy:
     image: caddy:2-alpine
